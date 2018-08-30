@@ -32,18 +32,15 @@
                                               (if (< (inc i) (.size cd))
                                                 (recur (assoc row-data (keyword name) value) (inc i))
                                                 (assoc row-data (keyword name) value)))))))
-    (instance? Map java-val)       (let [t (transient {})]
-                                     (doseq [[k v] java-val]
-                                       (assoc! t k v))
-                                     (persistent! t))
-    (instance? Set java-val)       (let [t (transient #{})]
-                                     (doseq [v java-val]
-                                       (conj! t v))
-                                     (persistent! t))
-    (instance? List java-val)      (let [t (transient [])]
-                                     (doseq [v java-val]
-                                       (conj! t v))
-                                     (persistent! t))
+    (instance? Map java-val)       (persistent!
+                                     (reduce (fn [t [k v]] (assoc! t k v))
+                                             (transient {}) java-val))
+    (instance? Set java-val)       (persistent!
+                                     (reduce (fn [t v] (conj! t v))
+                                             (transient #{}) java-val))
+    (instance? List java-val)      (persistent!
+                                     (reduce (fn [t [k v]] (conj! t v))
+                                             (transient []) java-val))
     (instance? Host java-val)      (let [^Host host java-val]
                                      {:datacenter (.getDatacenter host)
                                       :address    (.getHostAddress (.getAddress host))

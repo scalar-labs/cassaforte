@@ -481,8 +481,7 @@
                          (fn [opts [option-name option-vals]]
                            ((resolve-alter-option option-name) opts option-vals))
                          (.withOptions query-builder)
-                         options)
-                        query-builder)
+                         options))
 
 
        :add-column    (fn add-column-statement [query-builder [column-name column-type]]
